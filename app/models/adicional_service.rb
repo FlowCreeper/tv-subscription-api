@@ -1,4 +1,8 @@
 class AdicionalService < ApplicationRecord
+  # Link to Subscriptions
+  has_many :subscription_adicional_services
+  has_many :subscriptions, through: :subscription_adicional_services
+
   # Link to Packages
   has_many :package_adicional_services
   has_many :packages, through: :package_adicional_services

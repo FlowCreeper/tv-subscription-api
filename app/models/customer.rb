@@ -1,4 +1,7 @@
 class Customer < ApplicationRecord
+  # Link to Subscription
+  has_many :subscriptions
+
   # Validates if the Customer object has name and age
   validates :name, presence: true
   validates :age, presence: true,

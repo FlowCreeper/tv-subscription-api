@@ -1,4 +1,8 @@
 class Package < ApplicationRecord
+  # Link to Subscriptions
+  has_many :subscription_packages
+  has_many :subscriptions, through: :subscription_packages
+
   # Link to Plans
   has_many :package_plans
   has_many :plans, through: :package_plans
