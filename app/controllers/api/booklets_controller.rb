@@ -1,0 +1,56 @@
+class Api::BookletsController < ApplicationController
+  def show
+    if numeric_id?(params[:id])
+      invoices = Invoice.includes(subscription: [ :customer, :plans, :packages, :adicional_services ])
+                        .where(subscription_id: params[:id])
+                        .order(:due_date)
+    else
+      invoices = Invoice.joins(subscription: :customer)
+                        .where(customers: { name: params[:id] })
+                        .includes(:subscription)
+    end
+    if invoices.empty?
+      render json: { error: "No invoices found for this customer" }, status: :not_found
+      return
+    end
+
+    pdf = Prawn::Document.new
+
+    invoices.each_with_index do |invoice, index|
+      pdf.text "Fatura ##{invoice.id}", size: 24, style: :bold
+      pdf.move_down 10
+
+      pdf.text "Cliente: #{invoice.subscription.customer.name}"
+      pdf.text "Data de emissão: #{invoice.created_at.strftime('%d/%m/%Y')}"
+      pdf.text "Data de vencimento: #{invoice.due_date.strftime('%d/%m/%Y')}"
+      pdf.text "Valor total: R$ #{'%.2f' % invoice.amount}"
+      pdf.move_down 10
+
+      pdf.text "Itens da Assinatura", style: :bold
+      invoice.subscription.plans.each do |plan|
+        pdf.text "- Plano: #{plan.name} (R$ #{'%.2f' % plan.price})"
+      end
+      invoice.subscription.packages.each do |package|
+        pdf.text "- Pacote: #{package.name} (R$ #{'%.2f' % package.price})"
+      end
+      invoice.subscription.adicional_services.each do |service|
+        pdf.text "- Serviço adicional: #{service.name} (R$ #{'%.2f' % service.price})"
+      end
+
+      # Add a new page unless it's the last invoice
+      pdf.start_new_page unless index == invoices.size - 1
+    end
+
+    send_data pdf.render,
+              filename: "carnê-#{params[:id]}.pdf",
+              type: "application/pdf",
+              disposition: "inline"
+  end
+
+  private
+
+  def numeric_id?(value)
+    # Checks if the value is composed only of digits
+    value.to_s.match?(/\A\d+\z/)
+  end
+end

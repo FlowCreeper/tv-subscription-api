@@ -7,4 +7,11 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+
+  # API Routes
+  namespace :api do
+    # Invoice PDF Route
+    resources :invoices, only: [ :show ]
+    resources :booklets, only: [ :show ]
+  end
 end
