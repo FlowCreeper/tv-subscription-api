@@ -2,13 +2,11 @@ class Subscription < ApplicationRecord
   # Link to one Customer
   belongs_to :customer
 
-  # Link to Plans
-  has_many :subscription_plans
-  has_many :plans, through: :subscription_plans
+  # Link to a single Plan
+  belongs_to :plan, optional: true
 
-  # Link to Packages
-  has_many :subscription_packages
-  has_many :packages, through: :subscription_packages
+  # Link to a single Package
+  belongs_to :package, optional: true
 
   # Link to AdittionalServices
   has_many :subscription_adicional_services
@@ -27,37 +25,32 @@ class Subscription < ApplicationRecord
   # Calculates the total price
   def total_amount
     total = 0
-    total += plans.sum(&:price)
-    total += packages.sum(&:price)
+    total += plan.price if plan
+    total += package.price if package
     total += adicional_services.sum(&:price)
     total
   end
 
   private
 
-  # Verifies if there is only packages or only plans
-  def only_plans_or_packages_present
-    if plans.any? && packages.any?
-      errors.add(:base, "Assinatura não pode conter planos e pacotes ao mesmo tempo")
-    elsif plans.empty? && packages.empty?
-      errors.add(:base, "Assinatura deve conter pelo menos um plano ou um pacote")
+  # Ensure only one of plan or package is selected
+  def only_one_plan_or_package_present
+    if plan && package
+      errors.add(:base, "Assinatura não pode conter plano e pacote ao mesmo tempo")
+    elsif plan.nil? && package.nil?
+      errors.add(:base, "Assinatura deve conter um plano ou um pacote")
     end
   end
 
-  # Verifies if there is no AdicionalServices duplicate
-  def no_duplicate_adicional_services_from_packages
-    return if packages.empty? || adicional_services.empty?
+  # Check for duplicate adicional services from the selected package
+  def no_duplicate_adicional_services_from_package
+    return unless package && adicional_services.any?
 
-    # All packages services
-    package_service_ids = packages.includes(:adicional_services).flat_map do |package|
-      package.adicional_services.pluck(:id)
-    end
-
-    # Intersection between chosen additionals and package ones
+    package_service_ids = package.adicional_services.pluck(:id)
     duplicated = adicional_services.pluck(:id) & package_service_ids
 
     if duplicated.any?
-      errors.add(:adicional_services, "não pode conter serviços já inclusos nos pacotes selecionados")
+      errors.add(:adicional_services, "não pode conter serviços já inclusos no pacote selecionado")
     end
   end
 

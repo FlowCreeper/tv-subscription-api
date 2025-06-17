@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_16_220602) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_17_183306) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -46,20 +46,13 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_16_220602) do
     t.index ["package_id"], name: "index_package_adicional_services_on_package_id"
   end
 
-  create_table "package_plans", force: :cascade do |t|
-    t.bigint "package_id", null: false
-    t.bigint "plan_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["package_id"], name: "index_package_plans_on_package_id"
-    t.index ["plan_id"], name: "index_package_plans_on_plan_id"
-  end
-
   create_table "packages", force: :cascade do |t|
     t.string "name"
     t.decimal "price"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "plan_id", null: false
+    t.index ["plan_id"], name: "index_packages_on_plan_id"
   end
 
   create_table "plans", force: :cascade do |t|
@@ -107,7 +100,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_16_220602) do
     t.bigint "customer_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "plan_id"
+    t.bigint "package_id"
     t.index ["customer_id"], name: "index_subscriptions_on_customer_id"
+    t.index ["package_id"], name: "index_subscriptions_on_package_id"
+    t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
   end
 
   add_foreign_key "invoices", "subscriptions"
@@ -115,6 +112,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_16_220602) do
   add_foreign_key "package_adicional_services", "packages"
   add_foreign_key "package_plans", "packages"
   add_foreign_key "package_plans", "plans"
+  add_foreign_key "packages", "plans"
   add_foreign_key "subscription_adicional_services", "adicional_services"
   add_foreign_key "subscription_adicional_services", "subscriptions"
   add_foreign_key "subscription_packages", "packages"
@@ -122,4 +120,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_16_220602) do
   add_foreign_key "subscription_plans", "plans"
   add_foreign_key "subscription_plans", "subscriptions"
   add_foreign_key "subscriptions", "customers"
+  add_foreign_key "subscriptions", "packages"
+  add_foreign_key "subscriptions", "plans"
 end
