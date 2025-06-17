@@ -17,12 +17,14 @@ class Invoice < ApplicationRecord
       pdf.text "Itens da Assinatura", style: :bold
 
       # Add plans
-      subscription.plans.each do |plan|
+      if subscription.plan
+        plan = subscription.plan
         pdf.text "- Plano: #{plan.name} (R$ #{'%.2f' % plan.price})"
       end
 
       # Add packages
-      subscription.packages.each do |package|
+      if subscription.package
+        package = subscription.package
         pdf.text "- Pacote: #{package.name} (R$ #{'%.2f' % package.price})"
       end
 

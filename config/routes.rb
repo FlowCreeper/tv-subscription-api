@@ -16,6 +16,9 @@ Rails.application.routes.draw do
     resources :adicional_services
     resources :packages
 
+    # Subscription Route
+    resources :subscriptions
+
     # Invoice PDF Route
     resources :invoices, only: [ :show ]
     resources :booklets, only: [ :show ]

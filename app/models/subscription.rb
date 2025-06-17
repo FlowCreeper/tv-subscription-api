@@ -16,8 +16,8 @@ class Subscription < ApplicationRecord
   has_many :invoices
 
   # Validations
-  validate :only_plans_or_packages_present
-  validate :no_duplicate_adicional_services_from_packages
+  validate :only_one_plan_or_package_present
+  validate :no_duplicate_adicional_services_from_package
 
   # Invoice creation
   after_create :generate_invoices
@@ -47,7 +47,7 @@ class Subscription < ApplicationRecord
     return unless package && adicional_services.any?
 
     package_service_ids = package.adicional_services.pluck(:id)
-    duplicated = adicional_services.pluck(:id) & package_service_ids
+    duplicated = adicional_service_ids.map(&:to_i) & package_service_ids
 
     if duplicated.any?
       errors.add(:adicional_services, "não pode conter serviços já inclusos no pacote selecionado")
