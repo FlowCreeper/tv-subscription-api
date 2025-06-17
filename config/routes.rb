@@ -10,6 +10,12 @@ Rails.application.routes.draw do
 
   # API Routes
   namespace :api do
+    # Registering Routes
+    resources :customers
+    resources :plans
+    resources :adicional_services
+    resources :packages
+
     # Invoice PDF Route
     resources :invoices, only: [ :show ]
     resources :booklets, only: [ :show ]
