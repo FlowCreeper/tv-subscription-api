@@ -1,7 +1,7 @@
 class Api::BookletsController < ApplicationController
   def show
     if numeric_id?(params[:id])
-      invoices = Invoice.includes(subscription: [ :customer, :plans, :packages, :adicional_services ])
+      invoices = Invoice.includes(subscription: [ :customer, :plan, :package, :adicional_services ])
                         .where(subscription_id: params[:id])
                         .order(:due_date)
     else
@@ -27,12 +27,12 @@ class Api::BookletsController < ApplicationController
       pdf.move_down 10
 
       pdf.text "Itens da Assinatura", style: :bold
-      invoice.subscription.plans.each do |plan|
-        pdf.text "- Plano: #{plan.name} (R$ #{'%.2f' % plan.price})"
-      end
-      invoice.subscription.packages.each do |package|
-        pdf.text "- Pacote: #{package.name} (R$ #{'%.2f' % package.price})"
-      end
+      plan = invoice.subscription.plan
+      pdf.text "- Plano: #{plan.name} (R$ #{'%.2f' % plan.price})" if plan
+
+      package = invoice.subscription.package
+      pdf.text "- Pacote: #{package.name} (R$ #{'%.2f' % package.price})" if package
+
       invoice.subscription.adicional_services.each do |service|
         pdf.text "- Serviço adicional: #{service.name} (R$ #{'%.2f' % service.price})"
       end
