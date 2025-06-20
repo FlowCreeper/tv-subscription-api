@@ -4,12 +4,12 @@ class Api::PackagesController < ApplicationController
   # GET /api/packages
   def index
     packages = Package.all
-    render json: packages
+    render json: packages.to_json(include: :adicional_services)
   end
 
   # GET /api/packages/:id
   def show
-    render json: @package
+    render json: @package.to_json(include: :adicional_services)
   end
 
   # POST /api/packages

@@ -4,12 +4,12 @@ class Api::SubscriptionsController < ApplicationController
   # GET /api/subscriptions
   def index
     subscriptions = Subscription.all
-    render json: subscriptions
+    render json: subscriptions.to_json(include: :adicional_services)
   end
 
   # GET /api/subscriptions/:id
   def show
-    render json: @subscription
+    render json: @subscription.to_json(include: :adicional_services)
   end
 
   # POST /api/subscriptions
