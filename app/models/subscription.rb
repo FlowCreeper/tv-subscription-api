@@ -9,11 +9,11 @@ class Subscription < ApplicationRecord
   belongs_to :package, optional: true
 
   # Link to AdittionalServices
-  has_many :subscription_adicional_services
+  has_many :subscription_adicional_services, dependent: :destroy
   has_many :adicional_services, through: :subscription_adicional_services
 
   # Link to multiple Invoice
-  has_many :invoices
+  has_many :invoices, dependent: :destroy
 
   # Validations
   validate :only_one_plan_or_package_present
