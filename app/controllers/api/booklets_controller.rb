@@ -1,14 +1,9 @@
 class Api::BookletsController < ApplicationController
   def show
-    if numeric_id?(params[:id])
-      invoices = Invoice.includes(subscription: [ :customer, :plan, :package, :adicional_services ])
-                        .where(subscription_id: params[:id])
-                        .order(:due_date)
-    else
-      invoices = Invoice.joins(subscription: :customer)
-                        .where(customers: { name: params[:id] })
-                        .includes(:subscription)
-    end
+    invoices = Invoice.includes(subscription: [ :customer, :plan, :package, :adicional_services ])
+                      .where(subscription_id: params[:id])
+                      .order(:due_date)
+
     if invoices.empty?
       render json: { error: "No invoices found for this customer" }, status: :not_found
       return
@@ -45,12 +40,5 @@ class Api::BookletsController < ApplicationController
               filename: "carnê-#{params[:id]}.pdf",
               type: "application/pdf",
               disposition: "inline"
-  end
-
-  private
-
-  def numeric_id?(value)
-    # Checks if the value is composed only of digits
-    value.to_s.match?(/\A\d+\z/)
   end
 end
