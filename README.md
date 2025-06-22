@@ -17,10 +17,14 @@ bundle install
 ```
 
 ### Set up the database
+```bash
 rails db:create db:migrate db:seed
+```
 
 ### Start the server
+```bash
 rails server
+```
 
 ## API Endpoints
 
