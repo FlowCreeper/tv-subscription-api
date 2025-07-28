@@ -3,7 +3,7 @@ source "https://rubygems.org"
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.2"
 # Use PostgreSQL as the database
-gem "pg", "= 1.5.9"
+gem "pg", "1.6.0"
 # Use DotEnv for sensitive variables
 gem "dotenv-rails", groups: [ :development, :test ]
 # Use the Puma web server [https://github.com/puma/puma]
